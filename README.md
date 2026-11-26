@@ -231,14 +231,6 @@ Tuning constants live near the top of the sketch (`POINT_CELL_X_G`, `POINT_CELL_
 
 ---
 
-## How the reconnect works (the interesting part)
-
-A Wiimote that is powered on **never enters page scan** — it pages its stored host itself, once per press, then sleeps. Page scan is only enabled in discoverable mode (1+2 or SYNC). And 1+2 pairing does not save the host address, so a 1+2-paired remote has nothing to page. That is why the obvious approach — the ESP32 paging a cached address — fails: the ESP32 was paging a device that was not listening, and the remote had no address to page anyway.
-
-The patched library (2.0.3) flips it to **listen-first**: after reset, with a cached remote, the ESP32 sits in page scan for a 15-second listen window, then falls back to paging the cached address plus a short inquiry, and returns to listening (about 60% of the time listening). Incoming connection requests are accepted, and the peer address is read from the event and cached like an outgoing connection. One SYNC re-pair is all it takes.
-
----
-
 ## Project status
 
 - Roku control, TV power on disconnect, pointer mode, app shortcuts, battery LEDs: **working and hardware-verified**
@@ -265,8 +257,3 @@ The patched library (2.0.3) flips it to **listen-first**: after reset, with a ca
 - Roku External Control API: <https://developer.roku.com/dev/docs/external-control-api>
 - Pointer smoothing: One-Euro filter (Casiez et al.)
 
----
-
-## License
-
-MIT — do what you want with it, no warranty. If it breaks your TV setup, that is on you.
